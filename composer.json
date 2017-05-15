@@ -11,8 +11,8 @@
        "classmap": [
             "database"
         ],
-         "psr-4": {
-           "NattaponRa\\chatkun": "src/"
+       "psr-4": {
+           "chatkun\\": "src/"
  
       }
     },
