@@ -7,6 +7,15 @@
             "email": "nattapon.rakthong@gmail.com"
         }
     ],
+    "autoload": {
+        "classmap": [
+            "database"
+        ],
+        "psr-4": {
+            "NattaponRa\\chatkun": "src/"
+
+        }
+    },
     "require": {
           "php": ">=5.6.4",
           "cboden/ratchet": "^0.3.6"
