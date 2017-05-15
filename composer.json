@@ -9,7 +9,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "NattaponRa\\chatkun": "src/"
+            "NattaponRa\\chatkun\\": "src/"
         }
     },
     "require": {
