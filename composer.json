@@ -1,0 +1,10 @@
+{
+    "name": "nattaponra/chatkun",
+    "authors": [
+        {
+            "name": "John Doe",
+            "email": "johndoe@example.com"
+        }
+    ],
+    "require": {}
+}
