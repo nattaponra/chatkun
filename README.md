@@ -10,7 +10,7 @@ Laravel package for make sample chat application with Ratchet WebSockets.
 - XML PHP Extension
 
 
-# Install and Setup
+# Installation and Setting
 
 ## 1. Make Authentication Page
 Using artisan command to create authentication page.
