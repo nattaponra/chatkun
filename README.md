@@ -12,7 +12,7 @@ Laravel package for make sample chat application with Ratchet WebSockets.
 
 # Installation and Setting
 
-## 1. Make Authentication Page
+## 1. Installation authentication page
 Using artisan command to create authentication page.
 ```php
  php artisan make:auth
@@ -22,7 +22,7 @@ Using artisan command to create authentication page.
 ## 2. Make Vendor:Publish
 Using artisan command to generate our resource such as view,controller,model and migration.
 ```php
- php artisan verdor:publish
+ php artisan vendor:publish
     
 ```
 
