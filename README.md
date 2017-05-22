@@ -12,27 +12,48 @@ Laravel package for make sample chat application with Ratchet WebSockets.
 
 # Installation and Setting
 
-## 1. Installation authentication page
-Using artisan command to create authentication page.
+## 1. Install Package with Composer
+You can use composer to install chatkun package follow below command.
+```php
+composer require nattaponra/chatkun
+    
+```
+
+## 2. Installation authentication page
+Use artisan command to create authentication page. If you already make authentication you can skip this step.
 ```php
  php artisan make:auth
     
 ```
+## 3. Register Service Provider
+Before you can use chatkun package you must register service provider first!
+```php
+  Go to>config/app.php and append below command into this file.
+  
+      'providers' => [
+                     .
+                     .
+                     .
+                     .
+              NattaponRa\chatkun\ChatKunServiceProvider::class,
+        ],
+ 
+```
 
-## 2. Make Vendor:Publish
-Using artisan command to generate our resource such as view,controller,model and migration.
+## 4. Make Vendor:Publish
+Use artisan command to generate our resource such as view,controller,model and migration.
 ```php
  php artisan vendor:publish
     
 ```
 
-## 3. Create database table with migration file.
-Using artisan command to automaticaly create database tables from migration file.
+## 5. Create database table with migration file.
+Use artisan command to automaticaly create database tables from migration file.
 ```php
  php artisan migrate
     
 ```
-## 4. Add Command path in array "commands" in Kernel.php 
+## 6. Add Command path in array "commands" in Kernel.php 
 Add command path for enable custome artisam command
 ```php
 #  'App\Console\Kernel.php'
@@ -43,7 +64,7 @@ Add command path for enable custome artisam command
 ```
    
 
-## 4. Add Route 
+## 7. Add Route 
 Add our router for make chatting example page.
 ```php
 #routes/web.php
@@ -52,7 +73,7 @@ Route::get('chatkun',  'nattaponra\chatkun\ChatKunController@index');
     
     
 ```
-## 5. Server Setting
+## 8. Server Setting
 Please change below ip address to ip address of your server.
 ```javascript
  $.ajax({
@@ -105,10 +126,10 @@ Please change below ip address to ip address of your server.
 ```
 
 
-## 5. Run Web Socket
+## 9. Run Web Socket
 Open command line to run socket communication for support chatting.
 ```php
-php artisan chatkun:serve
+    php artisan chatkun:serve
 ```
 
 
