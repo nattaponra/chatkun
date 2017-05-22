@@ -16,14 +16,12 @@ Laravel package for make sample chat application with Ratchet WebSockets.
 You can use composer to install chatkun package follow below command.
 ```php
 composer require nattaponra/chatkun
-    
 ```
 
 ## 2. Installation authentication page
 Use artisan command to create authentication page. If you already make authentication you can skip this step.
 ```php
- php artisan make:auth
-    
+php artisan make:auth
 ```
 ## 3. Register Service Provider
 Before you can use chatkun package you must register service provider first!
@@ -68,10 +66,9 @@ Add command path for enable custome artisam command
 Add our router for make chatting example page.
 ```php
 #routes/web.php
- 
-Route::get('chatkun',  'nattaponra\chatkun\ChatKunController@index');
-    
-    
+
+Route::get('/chatkun',  'ChatKunController@index');
+   
 ```
 ## 8. Server Setting
 Please change below ip address to ip address of your server.
