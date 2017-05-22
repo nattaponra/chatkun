@@ -64,7 +64,7 @@
                  $('#to_user_id').val(user_id);
                 $.ajax({
                     method: "GET",
-                    url: "http://192.168.1.10/chatkun/history/"+user_id,
+                    url: "{{url('chatkun/history')}}/"+user_id,
                     data: { name: "John", location: "Boston" }
                 })
                         .done(function( data ) {
