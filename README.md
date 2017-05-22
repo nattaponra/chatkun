@@ -73,14 +73,7 @@ Route::get('/chatkun/history/{to_user_id}',  'ChatKunController@viewHistory');
 ```
 ## 8. Server Setting
 Please change below ip address to ip address of your server.
-```javascript
- $.ajax({
-                    method: "GET",
-                    url: "http://192.168.1.10/chatkun/history/"+user_id,
-                    data: { name: "John", location: "Boston" }
-                })
-```
-## And
+ 
 ```javascript
       function connect() {
                     var socket;
