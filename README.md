@@ -40,7 +40,7 @@ Before you can use chatkun package you must register service provider first!
  
 ```
 
-## 4. Make Vendor:Publish
+## 4. Make Vender:Publish
 Use artisan command to generate our resource such as view,controller,model and migration.
 ```php
  php artisan vendor:publish
