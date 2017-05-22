@@ -68,6 +68,7 @@ Add our router for make chatting example page.
 #routes/web.php
 
 Route::get('/chatkun',  'ChatKunController@index');
+Route::get('/chatkun/history/{to_user_id}',  'ChatKunController@viewHistory');
    
 ```
 ## 8. Server Setting
