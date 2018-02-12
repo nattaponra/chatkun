@@ -3,14 +3,13 @@
 namespace nattaponra\chatkun;
 
 
-class Chatkun
+class ChatKun
 {
-
     private $service;
 
-    public function __construct(iChatkun $chatkun)
+    public function __construct(ChatKunServiceInterface $chatKunServiceInterface)
     {
-        $this->service = $chatkun;
+        $this->service = $chatKunServiceInterface;
 
     }
 

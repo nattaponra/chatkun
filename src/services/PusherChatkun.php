@@ -3,10 +3,10 @@
 
 namespace nattaponra\chatkun\services;
 
-use nattaponra\chatkun\iChatkun;
+use nattaponra\chatkun\ChatKunServiceInterface;
 use Pusher\Pusher;
 
-class PusherChatkun implements iChatkun
+class PusherChatKun implements ChatKunServiceInterface
 {
     private $app_id;
     private $auth_key;
@@ -28,6 +28,7 @@ class PusherChatkun implements iChatkun
         if ($cluster != null) {
             $options['cluster'] = $cluster;
         }
+
         $this->pusher = new Pusher(
             $auth_key,
             $secret_key,
@@ -36,15 +37,7 @@ class PusherChatkun implements iChatkun
         );
     }
 
-    public function authen()
-    {
-        return ["auth_key" => $this->auth_key, "app_id" => $this->app_id, "secret_key" => $this->secret_key];
-    }
 
-    public function authenType()
-    {
-        return "app_id";
-    }
 
     public function sendMessage($formUserID, $toUserID, $message)
     {
@@ -52,4 +45,7 @@ class PusherChatkun implements iChatkun
 
         return $this->pusher->trigger($toUserID, "my-event", $data);
     }
+
+
+
 }
