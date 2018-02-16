@@ -13,13 +13,15 @@ class PusherChatKun implements ChatKunServiceInterface
     private $secret_key;
     private $cluster;
     private $pusher;
-    public function __construct($auth_key, $app_id, $secret_key, $cluster = null)
+    private $event;
+    public function __construct($auth_key, $app_id, $secret_key, $cluster = null,$event = "my-event")
     {
 
         $this->app_id     = $app_id;
         $this->auth_key   = $auth_key;
         $this->secret_key = $secret_key;
         $this->cluster    = $cluster;
+        $this->event      = $event;
 
         $options = array(
             'encrypted' => true
@@ -39,11 +41,13 @@ class PusherChatKun implements ChatKunServiceInterface
 
 
 
-    public function sendMessage($formUserID, $toUserID, $message)
+    public function sendMessage($formUserID, $toUserID, $message,$option)
     {
-        $data = array('message' => $message, 'from' => $formUserID);
+        $data            = $option;
+        $data['message'] = $message;
+        $data['from']    = $formUserID;
 
-        return $this->pusher->trigger($toUserID, "my-event", $data);
+        return $this->pusher->trigger($toUserID, $this->event, $data);
     }
 
 

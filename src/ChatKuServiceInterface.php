@@ -6,6 +6,6 @@ namespace nattaponra\chatkun;
 interface ChatKunServiceInterface
 {
 
-    public function sendMessage($formUserID, $toUserID, $message);
+    public function sendMessage($formUserID, $toUserID, $message,$option);
 
 }
