@@ -13,9 +13,9 @@ class ChatKun
 
     }
 
-    public function sendMessage($formUserID, $toUserID, $message,$option=[])
+    public function sendMessage($formUserID, $toUserID, $message, $option = [])
     {
-        return $this->service->sendMessage($formUserID, $toUserID, $message,$option);
+        return $this->service->sendMessage($formUserID, $toUserID, $message, $option);
     }
 
 }
