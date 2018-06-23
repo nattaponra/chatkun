@@ -5,7 +5,37 @@
 ```
 composer require nattaponra/chatkun
 ```
-## Example
+
+## 1.Add Service Provider
+```php
+ 'providers' => [
+
+        /*
+         * Laravel Framework Service Providers...
+         */
+         .
+         .
+         .
+         .
+         nattaponra\chatkun\ChatKunServiceProvider::class,
+        
+ ```
+## 2.Add trait in User model
+Add trait 'HasChatKun' in App/User.php  
+```
+use nattaponra\chatkun\HasChatKun;
+
+class User extends Authenticatable
+{
+    use HasChatKun;
+    
+    .
+    .
+    .
+}
+```
+
+## 3.Using
 ```php
       $user1    = User::find(1);
       $user2    = User::find(2);
