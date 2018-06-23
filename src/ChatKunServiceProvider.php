@@ -16,7 +16,7 @@ class ChatKunServiceProvider extends ServiceProvider
 
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
-        //$this->publishes([__DIR__.'/config/config.php' => config_path('larawallet.php'),]);
+        $this->publishes([__DIR__.'/config/config.php' => config_path('chatkun.php'),]);
     }
 
     /**
