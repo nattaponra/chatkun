@@ -48,21 +48,18 @@ class ChatKun extends Model
             $this->createInitialMessage($toUser);
         }
 
-
         //Save message to database.
         $chatKunMessage->user_id    = $this->fromUser->id;
         $chatKunMessage->to_user_id = $toUser->id;
         $chatKunMessage->save();
 
-        foreach ($chatKunMessage->getSubMessages() as $subMessage){
+        //Save sub message to database.
+        $subMessage = $chatKunMessage->getSubMessage();
+        $subMessage->messages_id = $chatKunMessage->id;
+        $subMessage->save();
 
-            //Send message to service.
-             $this->sendMessageToService($this->fromUser->id, $toUser->id, $subMessage->getMessage());
-
-            //Save sub message to database.
-            $subMessage->messages_id = $chatKunMessage->id;
-            $subMessage->save();
-       }
+        //Send message to service.
+        //$this->sendMessageToService($this->fromUser->id, $toUser->id, $subMessage->getMessage());
 
     }
 
@@ -83,7 +80,7 @@ class ChatKun extends Model
 
     private function hasInitialMessage(User $toUser){
 
-        $count = $this->chatKunMessageModel->where("to_user_id",$toUser->id)->whereHas("subMessages",function($query){
+        $count = $this->chatKunMessageModel->where("to_user_id",$toUser->id)->whereHas("subMessage",function($query){
             $query->where("sub_message_type","initial_message");
         })->count();
 
@@ -99,7 +96,7 @@ class ChatKun extends Model
             $query->where("user_id",$userId);
             $query->orWhere('to_user_id',$userId);
 
-        })->whereHas("subMessages",function($query){
+        })->whereHas("subMessage",function($query){
 
             $query->where("sub_message_type","initial_message");
 
@@ -122,6 +119,21 @@ class ChatKun extends Model
 
     }
 
+    public function getChatHistories(User $toUser){
+
+        $myUserId        = $this->fromUser->id;
+        $contactUserId   = $toUser->id;
+
+        $messages = $results = $this->chatKunMessageModel
+             ->where(function($query) use($myUserId,$contactUserId){
+                $query->where("user_id",$myUserId)->where("to_user_id",$contactUserId);})
+             ->orWhere(function($query) use($myUserId,$contactUserId){
+                $query->where("to_user_id",$myUserId)->where("user_id",$contactUserId);
+        })->orderBy("created_at","DESC")->get();
+
+
+        return $messages;
+    }
 
 }
 
