@@ -20,5 +20,9 @@ class ChatKunMessage extends Model
         return $this->chatKunSubMessages;
     }
 
+    public function subMessages(){
+        return $this->hasMany(ChatKunSubMessage::class,"messages_id","id");
+    }
+
 
 }
