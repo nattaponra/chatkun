@@ -24,6 +24,10 @@ class ChatKun extends Model
         return $this->hasOne("App\User", "id", "user_id");
     }
 
+    /** @param string $from
+     *  @param  string $to
+     *  @param  string $message
+     */
     private function sendMessageToService($from, $to, $message)
     {
         $chatKunFactory = new ChatKunFactory();
@@ -31,29 +35,27 @@ class ChatKun extends Model
         $chatKunService->sendMessage($from, $to, $message);
     }
 
+    /** @param \App\User $toUser
+     *  @param  \Nattaponra\chatkun\ChatKunMessage $chatKunMessage
+     *
+     */
     public function sendMessage(User $toUser,ChatKunMessage $chatKunMessage)
     {
-
+        //Save message to database.
         $chatKunMessage->user_id    = $this->fromUser->id;
         $chatKunMessage->to_user_id = $toUser->id;
         $chatKunMessage->save();
 
-       foreach ($chatKunMessage->getSubMessages() as $subMessage){
+        foreach ($chatKunMessage->getSubMessages() as $subMessage){
+
+            //Send message to service.
+            $this->sendMessageToService($this->fromUser->id, $toUser->id, $subMessage->getMessage());
+
+            //Save sub message to database.
             $subMessage->messages_id = $chatKunMessage->id;
             $subMessage->save();
        }
-        //Send message to service
-//        $this->sendMessageToService($this->fromUser->id, $user->id, $chatKunSubMessage->getMessage());
-//
-//        //Save message to database
-//        $chatKunMessage = ChatKunMessage::create([
-//            'user_id'    => $this->fromUser->id,
-//            'to_user_id' => $user->id
-//        ]);
-//
-//        $chatKunSubMessage->save();
-//
-//        return $chatKunMessage;
+
     }
 
 
