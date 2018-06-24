@@ -12,10 +12,11 @@ class ChatKun extends Model
     protected $table = "chatkun";
     protected $fillable = ["user_id"];
     private $chatKunMessageModel;
-
+    private $userModel;
     public function __construct(array $attributes = [])
     {
         $this->chatKunMessageModel = App::make(ChatKunMessage::class);
+        $this->userModel           = App::make(User::class);
         parent::__construct($attributes);
     }
 
@@ -41,6 +42,13 @@ class ChatKun extends Model
      */
     public function sendMessage(User $toUser,ChatKunMessage $chatKunMessage)
     {
+
+        //Create initial message
+        if(!$this->hasInitialMessage($toUser)){
+            $this->createInitialMessage($toUser);
+        }
+
+
         //Save message to database.
         $chatKunMessage->user_id    = $this->fromUser->id;
         $chatKunMessage->to_user_id = $toUser->id;
@@ -49,7 +57,7 @@ class ChatKun extends Model
         foreach ($chatKunMessage->getSubMessages() as $subMessage){
 
             //Send message to service.
-            $this->sendMessageToService($this->fromUser->id, $toUser->id, $subMessage->getMessage());
+             $this->sendMessageToService($this->fromUser->id, $toUser->id, $subMessage->getMessage());
 
             //Save sub message to database.
             $subMessage->messages_id = $chatKunMessage->id;
@@ -58,11 +66,60 @@ class ChatKun extends Model
 
     }
 
+    private function createInitialMessage(User $toUser){
+
+        $chatKunMessage             = new ChatKunMessage();
+        $chatKunMessage->user_id    = $this->fromUser->id;
+        $chatKunMessage->to_user_id = $toUser->id;
+        $chatKunMessage->save();
+
+        $subMessage = new ChatKunSubMessage();
+        $subMessage->setMessage("initial_message");
+        $subMessage->setSubMessageType("initial_message");
+        $subMessage->messages_id = $chatKunMessage->id;
+        $subMessage->save();
+    }
+
+
+    private function hasInitialMessage(User $toUser){
+
+        $count = $this->chatKunMessageModel->where("to_user_id",$toUser->id)->whereHas("subMessages",function($query){
+            $query->where("sub_message_type","initial_message");
+        })->count();
+
+        return $count == 1 ? true:false;
+    }
 
     public function getMyContact()
     {
-       // $this->chatKunMessageModel->where("user_id",);
-        return  ;
+        $userId   = $this->fromUser->id;
+        //Send to
+        $results = $this->chatKunMessageModel->where(function($query) use ($userId){
+
+            $query->where("user_id",$userId);
+            $query->orWhere('to_user_id',$userId);
+
+        })->whereHas("subMessages",function($query){
+
+            $query->where("sub_message_type","initial_message");
+
+        })->get();
+
+        $userIds = [];
+        foreach ($results as $result){
+
+            if($result->to_user_id != $userId){
+                $userIds[] = $result->to_user_id;
+            }
+
+            if($result->user_id != $userId){
+                $userIds[] = $result->user_id;
+            }
+
+        }
+
+        return $this->userModel->whereIn("id",$userIds)->get();
+
     }
 
 
