@@ -9,20 +9,23 @@ class ChatKunMessage extends Model
 {
     protected $fillable             = ["user_id","to_user_id"];
     protected $table                = "chatkun_messages";
-    private   $chatKunSubMessages   = [];
+    private   $chatKunSubMessage;
 
 
-    public function addSubMessages(ChatKunSubMessage $chatKunSubMessage){
-        $this->chatKunSubMessages[] = $chatKunSubMessage;
+    public function addSubMessage(ChatKunSubMessage $chatKunSubMessage){
+        $this->chatKunSubMessage = $chatKunSubMessage;
     }
 
-    public function getSubMessages(){
-        return $this->chatKunSubMessages;
+    public function getSubMessage(){
+        return $this->chatKunSubMessage;
     }
 
-    public function subMessages(){
-        return $this->hasMany(ChatKunSubMessage::class,"messages_id","id");
+    public function subMessage(){
+        return $this->hasOne(ChatKunSubMessage::class,"messages_id","id");
     }
 
+    public function senderUser(){
+        return $this->hasOne(User::class,"id","user_id");
+    }
 
 }
