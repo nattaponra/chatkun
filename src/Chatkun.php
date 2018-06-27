@@ -135,6 +135,10 @@ class ChatKun extends Model
         return $messages;
     }
 
+    public function sendMessageGroup($groupId, ChatKunMessage $chatKunMessage){
+
+    }
+
 }
 
 
