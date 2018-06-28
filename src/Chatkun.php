@@ -29,11 +29,11 @@ class ChatKun extends Model
      *  @param  string $to
      *  @param  string $message
      */
-    private function sendMessageToService($from, $to, $message)
+    private function sendMessageToService(User $user, $to, $message)
     {
         $chatKunFactory = new ChatKunFactory();
         $chatKunService = $chatKunFactory->getChatService(config("chatkun.default_service", ""));
-        $chatKunService->sendMessage($from, $to, $message);
+        $chatKunService->sendMessage($user, $to, $message);
     }
 
     /** @param \App\User $toUser
@@ -46,7 +46,7 @@ class ChatKun extends Model
         $subMessage = $chatKunMessage->getSubMessage();
 
         //Send message to service.
-        $this->sendMessageToService($this->fromUser->id, $toUser->id, $subMessage->getMessage());
+        $this->sendMessageToService($this->fromUser, $toUser->id, $subMessage->getMessage());
 
 
         //Create initial message
@@ -148,7 +148,7 @@ class ChatKun extends Model
         $subMessage = $chatKunMessage->getSubMessage();
 
         //Send message to service.
-        $this->sendMessageToService($this->fromUser->id, $groupId, $subMessage->getMessage());
+        $this->sendMessageToService($this->fromUser, $groupId, $subMessage->getMessage());
 
 
 
@@ -161,6 +161,19 @@ class ChatKun extends Model
         //Save sub message to database.
         $subMessage->messages_id = $chatKunMessage->id;
         $subMessage->save();
+    }
+
+
+    public function getChatGroupHistories($groupId){
+
+       return $this->chatKunMessageModel
+            ->where("chat_type","group")
+            ->where("to_user_id",$groupId)
+            ->whereHas("subMessage",function($query){
+               $query->whereNotNull("id");
+             })->with("subMessage")->orderBy("id","ASC")->get();
+
+
     }
 
 }

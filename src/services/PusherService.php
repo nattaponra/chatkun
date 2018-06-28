@@ -4,6 +4,7 @@
 namespace nattaponra\chatkun\services;
 
 
+use App\User;
 use Pusher\Pusher;
 
 class PusherService implements ChatKunServiceInterface
@@ -24,10 +25,12 @@ class PusherService implements ChatKunServiceInterface
        $this->pusher     = new Pusher($this->app_key, $this->secret_key, $this->app_id, $this->options);
     }
 
-    public function sendMessage($form, $to, $message,$event="my")
+    public function sendMessage(User $user, $to, $message,$event="my")
     {
-        $data['message'] = $message;
-        $data['from']    = $form;
+        $data['message']     = $message;
+        $data['sender_id']   = $user->id;
+        $data['sender_name'] = $user->name;
+
         return $this->pusher->trigger($to.'-channel', $event."-event", $data);
     }
 }
