@@ -20,14 +20,14 @@ class PusherService implements ChatKunServiceInterface
        $this->app_id     = config("chatkun.services.pusher.app_id");
        $this->app_key    = config("chatkun.services.pusher.key");
        $this->secret_key = config("chatkun.services.pusher.secret");
-
        $this->options    = config("chatkun.services.pusher.options");
        $this->pusher     = new Pusher($this->app_key, $this->secret_key, $this->app_id, $this->options);
     }
 
-    public function sendMessage($form, $to, $message)
+    public function sendMessage($form, $to, $message,$event="my")
     {
         $data['message'] = $message;
-        return $this->pusher->trigger($form.'-channel', $to.'-event', $data);
+        $data['from']    = $form;
+        return $this->pusher->trigger($to.'-channel', $event."-event", $data);
     }
 }
