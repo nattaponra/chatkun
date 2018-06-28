@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\App;
 class ChatKun extends Model
 {
     protected $table = "chatkun";
-    protected $fillable = ["user_id"];
+    protected $fillable = ["user_id","last_online"];
     private $chatKunMessageModel;
     private $userModel;
     public function __construct(array $attributes = [])

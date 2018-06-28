@@ -10,7 +10,8 @@ trait HasChatKun
     private function initChatKun($chatKun)
     {
         $chatKun->create([
-            'user_id' => $this->id,
+            'user_id'     => $this->id,
+            'last_online' => date("Y-m-d H:i:s")
         ]);
     }
 
