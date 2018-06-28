@@ -42,6 +42,12 @@ class ChatKun extends Model
      */
     public function sendMessage(User $toUser,ChatKunMessage $chatKunMessage)
     {
+        //Get Message
+        $subMessage = $chatKunMessage->getSubMessage();
+
+        //Send message to service.
+        $this->sendMessageToService($this->fromUser->id, $toUser->id, $subMessage->getMessage());
+
 
         //Create initial message
         if(!$this->hasInitialMessage($toUser)){
@@ -51,15 +57,15 @@ class ChatKun extends Model
         //Save message to database.
         $chatKunMessage->user_id    = $this->fromUser->id;
         $chatKunMessage->to_user_id = $toUser->id;
+        $chatKunMessage->chat_type  = "user_to_user";
         $chatKunMessage->save();
 
         //Save sub message to database.
-        $subMessage = $chatKunMessage->getSubMessage();
+
         $subMessage->messages_id = $chatKunMessage->id;
         $subMessage->save();
 
-        //Send message to service.
-        //$this->sendMessageToService($this->fromUser->id, $toUser->id, $subMessage->getMessage());
+
 
     }
 
@@ -68,6 +74,7 @@ class ChatKun extends Model
         $chatKunMessage             = new ChatKunMessage();
         $chatKunMessage->user_id    = $this->fromUser->id;
         $chatKunMessage->to_user_id = $toUser->id;
+        $chatKunMessage->chat_type  = "initial_message";
         $chatKunMessage->save();
 
         $subMessage = new ChatKunSubMessage();
@@ -136,7 +143,16 @@ class ChatKun extends Model
     }
 
     public function sendMessageGroup($groupId, ChatKunMessage $chatKunMessage){
+        //Save message to database.
+        $chatKunMessage->user_id    = $this->fromUser->id;
+        $chatKunMessage->to_user_id = $groupId;
+        $chatKunMessage->chat_type  = "group";
+        $chatKunMessage->save();
 
+        //Save sub message to database.
+        $subMessage = $chatKunMessage->getSubMessage();
+        $subMessage->messages_id = $chatKunMessage->id;
+        $subMessage->save();
     }
 
 }
