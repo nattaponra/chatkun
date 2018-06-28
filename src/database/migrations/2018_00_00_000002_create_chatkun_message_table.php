@@ -12,6 +12,7 @@ class CreateChatkunMessageTable extends Migration
         Schema::create("chatkun_messages", function (Blueprint $table) {
 
             $table->increments('id');
+            $table->string('chat_type')->index();
             $table->unsignedInteger('user_id')->index();
             $table->integer("to_user_id")->index();
             $table->timestamps();
