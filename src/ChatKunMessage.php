@@ -10,7 +10,7 @@ class ChatKunMessage extends Model
     protected $fillable             = ["user_id","to_user_id"];
     protected $table                = "chatkun_messages";
     private   $chatKunSubMessage;
-
+    protected $appends = ["SenderName"];
 
     public function addSubMessage(ChatKunSubMessage $chatKunSubMessage){
         $this->chatKunSubMessage = $chatKunSubMessage;
@@ -25,7 +25,15 @@ class ChatKunMessage extends Model
     }
 
     public function senderUser(){
-        return $this->hasOne(User::class,"id","user_id");
+        return $this->hasOne("App\User","id","user_id");
     }
+
+    public function getSenderNameAttribute(){
+        if($this->senderUser){
+            return  $this->senderUser->name;
+        }
+    }
+
+
 
 }
