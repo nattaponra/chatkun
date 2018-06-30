@@ -133,10 +133,10 @@ class ChatKun extends Model
 
         $messages = $results = $this->chatKunMessageModel
              ->where(function($query) use($myUserId,$contactUserId){
-                $query->where("user_id",$myUserId)->where("to_user_id",$contactUserId);})
-             ->orWhere(function($query) use($myUserId,$contactUserId){
-                $query->where("to_user_id",$myUserId)->where("user_id",$contactUserId);
-        })->orderBy("created_at","DESC")->get();
+                $query->where("user_id",$myUserId)->where("to_user_id",$contactUserId)->where("chat_type","!=","initial_message");
+             })->orWhere(function($query) use($myUserId,$contactUserId){
+                $query->where("to_user_id",$myUserId)->where("user_id",$contactUserId)->where("chat_type","!=","initial_message");
+        })->orderBy("created_at","ASC")->get();
 
 
         return $messages;
