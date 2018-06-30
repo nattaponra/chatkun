@@ -103,10 +103,6 @@ class ChatKun extends Model
             $query->where("user_id",$userId);
             $query->orWhere('to_user_id',$userId);
 
-        })->whereHas("subMessage",function($query){
-
-            $query->where("sub_message_type","initial_message");
-
         })->get();
 
         $userIds = [];
@@ -121,7 +117,7 @@ class ChatKun extends Model
             }
 
         }
-
+        $userIds = array_unique($userIds);
         return $this->userModel->whereIn("id",$userIds)->get();
 
     }
