@@ -172,6 +172,41 @@ class ChatKun extends Model
 
     }
 
+
+    public function getLastMessage(User $contactUser){
+        $myUserId        = $this->fromUser->id;
+        $contactUserId   = $contactUser->id;
+
+        $fromMessages = $results = $this->chatKunMessageModel
+            ->where("user_id",$contactUserId)
+            ->where("to_user_id",$myUserId)
+            ->where("chat_type","!=","initial_message")
+            ->with("subMessage")
+            ->first();
+
+
+        $toMessages = $results = $this->chatKunMessageModel
+                ->where("user_id",$myUserId)
+                ->where("to_user_id",$contactUserId)
+                ->where("chat_type","!=","initial_message")
+                ->with("subMessage")
+                ->first();
+
+        if(empty($fromMessages)){
+
+            if(!empty($toMessages)){
+
+                return $toMessages;
+                
+            }else{
+                return "";
+            }
+
+        }else{
+            return $fromMessages;
+        }
+    }
+
 }
 
 
