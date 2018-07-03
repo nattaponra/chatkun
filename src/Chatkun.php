@@ -146,8 +146,6 @@ class ChatKun extends Model
         //Send message to service.
         $this->sendMessageToService($this->fromUser, $groupId, $subMessage->getMessage());
 
-
-
         //Save message to database.
         $chatKunMessage->user_id    = $this->fromUser->id;
         $chatKunMessage->to_user_id = $groupId;
@@ -160,14 +158,14 @@ class ChatKun extends Model
     }
 
 
-    public function getChatGroupHistories($groupId){
+    public function getChatGroupHistories($groupId, $limit=100 ){
 
        return $this->chatKunMessageModel
             ->where("chat_type","group")
             ->where("to_user_id",$groupId)
             ->whereHas("subMessage",function($query){
                $query->whereNotNull("id");
-             })->with("subMessage")->orderBy("id","ASC")->get();
+             })->with("subMessage")->orderBy("id","ASC")->limit($limit)->get();
 
 
     }
