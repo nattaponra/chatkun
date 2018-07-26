@@ -25,7 +25,7 @@ class ChatKunMessage extends Model
     }
 
     public function senderUser(){
-        return $this->hasOne("App\User","id","user_id");
+        return $this->hasOne("App\User","id","user_id")->select(['id', 'name']);
     }
 
     public function getSenderNameAttribute(){
