@@ -5,14 +5,15 @@ namespace nattaponra\chatkun;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
-class ChatKunMessage extends Model
+class ChatKunRoom extends Model
 {
-    protected $fillable  = ["message_type","message","user_id","room_id"];
+    protected $fillable  = ["name"];
 
     public function __construct(array $attributes = [])
     {
-        $this->table = "chatkun_messages";
+        $this->table = "chatkun_rooms";
         parent::__construct($attributes);
     }
+
 
 }

@@ -26,6 +26,8 @@ class ChatKunServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+        $this->app->singleton('chatkun', function () {
+            return new ChatKun(new ChatKunRoom() ,new ChatKunMessage(),new ChatKunFactory());
+        });
     }
 }
