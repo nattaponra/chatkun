@@ -2,12 +2,24 @@
 
 
 namespace nattaponra\chatkun;
+
+
+
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class ChatKunRoom extends Model
 {
-    protected $fillable  = ["name"];
+
+    /** @var string  */
+    const USER_TO_USER_ROOM = 'user_to_user';
+
+
+    /** @var string  */
+    const GROUP_ROOM = 'group';
+
+
+    protected $fillable  = ["name","room_type"];
 
     public function __construct(array $attributes = [])
     {

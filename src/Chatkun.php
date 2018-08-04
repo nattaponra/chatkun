@@ -3,6 +3,7 @@
 namespace nattaponra\chatkun;
 
 
+
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -24,11 +25,14 @@ class ChatKun
 
     /**
      * @param  string $name
+     * @param  string $roomType
      * @return Model|ChatKunRoom
      */
-    public function createRoom($name){
+    public function createRoom($name,$roomType){
+
         return $this->chatKunRoomModel->create([
-            'name' => $name
+            'name' => $name,
+            'room_type' => $roomType
         ]);
     }
 

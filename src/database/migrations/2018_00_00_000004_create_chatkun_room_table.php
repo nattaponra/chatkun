@@ -14,6 +14,7 @@ class CreateChatkunRoomTable extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->string("name");
+            $table->string("room_type")->index();
 
         });
     }
