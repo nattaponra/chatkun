@@ -15,5 +15,8 @@ class ChatKunRoomMember extends Model
         parent::__construct($attributes);
     }
 
+    public function room(){
+        return $this->hasOne(ChatKunRoom::class,"id","room_id");
+    }
 
 }

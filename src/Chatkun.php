@@ -94,6 +94,50 @@ class ChatKun
     public function history($roomId,$messagePerPage){
         return $this->chatKunMessageModel->where("room_id",$roomId)->paginate($messagePerPage);
     }
+
+    public function getContacts(User $me){
+
+        $rooms =  $this->chatKunRoomMemberModel->where("user_id",$me->id)->get();
+        $roomIds = [];
+
+        foreach ($rooms as $room){
+            $roomIds[] = $room->room_id;
+        }
+
+        $roomMembers =  $this->chatKunRoomMemberModel->whereIn("room_id",$roomIds)->where("user_id","!=",$me->id)->get();
+
+        $memberIds = [];
+        foreach ($roomMembers as $roomMember){
+            $memberIds[] = $roomMember->user_id;
+        }
+
+        return User::whereIn("id",$memberIds)->get();
+    }
+
+    public function generateRoomByUser($roomType, User $me, User $contactUser){
+
+        $rooms =  $this->chatKunRoomMemberModel->whereHas('room', function ($query) use ($roomType) {
+            $query->where('room_type',$roomType);
+        })->where("user_id",$me->id)->get();
+
+        $roomIds = [];
+
+        foreach ($rooms as $room){
+            $roomIds[] = $room->room_id;
+        }
+
+        $room =  $this->chatKunRoomMemberModel->whereHas('room', function ($query) use ($roomType) {
+            $query->where('room_type',$roomType);
+        })->whereIn("room_id",$roomIds)->where("user_id",$contactUser->id)->first();
+
+        if(empty($room)){
+            $room = $this->createRoom($roomType,"ROOM_".$me->id."_".$contactUser->id);
+        }else{
+            $room = $this->chatKunRoomModel->find($room->room_id);
+        }
+
+        return $room;
+    }
 }
 
 

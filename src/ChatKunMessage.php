@@ -20,4 +20,9 @@ class ChatKunMessage extends Model
         return $this->hasOne("App\User","id","user_id");
     }
 
+
+    public function getMessage(){
+        return $this->message_content;
+    }
+
 }
