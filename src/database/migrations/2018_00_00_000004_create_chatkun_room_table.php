@@ -2,19 +2,19 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-class CreateChatKunTable extends Migration
+class CreateChatkunRoomTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up()
     {
-        Schema::create("chatkun", function (Blueprint $table) {
+        Schema::create("chatkun_rooms", function (Blueprint $table) {
 
             $table->increments('id');
-            $table->unsignedInteger('user_id')->index();
-            $table->dateTime("last_online");
             $table->timestamps();
+            $table->string("name");
+            $table->string("room_type")->index();
 
         });
     }
@@ -23,6 +23,6 @@ class CreateChatKunTable extends Migration
      */
     public function down()
     {
-        Schema::drop("chatkun");
+        Schema::drop("chatkun_rooms");
     }
 }
