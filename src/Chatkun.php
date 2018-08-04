@@ -92,7 +92,10 @@ class ChatKun
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function history($roomId,$messagePerPage){
-        return $this->chatKunMessageModel->where("room_id",$roomId)->paginate($messagePerPage);
+        $history =  $this->chatKunMessageModel->where("room_id",$roomId)->orderBy("id","DESC")->paginate($messagePerPage);
+        $history = $history->sortBy("id");
+
+        return $history;
     }
 
     public function getContacts(User $me){
