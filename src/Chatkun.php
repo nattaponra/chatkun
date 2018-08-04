@@ -22,8 +22,8 @@ class ChatKun
         $this->chatKunRoomMemberModel = $chatKunRoomMember;
     }
 
-    /**  @param  string $name
-     *
+    /**
+     * @param  string $name
      * @return Model|ChatKunRoom
      */
     public function createRoom($name){
@@ -40,7 +40,8 @@ class ChatKun
         return $this->chatKunRoomModel->find($roomId);
     }
 
-    /** @param \App\User $user
+    /**
+     * @param \App\User $user
      * @param  \nattaponra\chatkun\ChatKunRoom $chatKunRoom
      * @return Model|ChatKunRoomMember|null
      */
@@ -58,7 +59,8 @@ class ChatKun
         return $member;
     }
 
-    /** @param \App\User $user
+    /**
+     * @param \App\User $user
      * @param  \nattaponra\chatkun\ChatKunRoom $chatKunRoom
      * @param  string $messageType
      * @param  string $messageContent
