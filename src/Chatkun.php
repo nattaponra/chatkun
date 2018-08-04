@@ -77,15 +77,16 @@ class ChatKun
        $chatKunService = $this->chatKunFactory->getChatService(config("chatkun.default_service", ""));
        $chatKunService->sendMessage($message);
 
-
+        return $message;
     }
-
 
     /**
      * @param integer $roomId
+     * @param integer $messagePerPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function history($roomId){
-        return $this->chatKunMessageModel->where("room_id",$roomId)->get();
+    public function history($roomId,$messagePerPage){
+        return $this->chatKunMessageModel->where("room_id",$roomId)->paginate($messagePerPage);
     }
 }
 
