@@ -3,10 +3,9 @@
 
 namespace nattaponra\chatkun\services;
 
-
-use App\User;
+use nattaponra\chatkun\ChatKunMessage;
 
 interface ChatKunServiceInterface
 {
-   public function sendMessage(User $form,$to,$message);
+   public function sendMessage(ChatKunMessage $chatKunMessage);
 }

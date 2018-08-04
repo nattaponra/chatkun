@@ -3,208 +3,141 @@
 namespace nattaponra\chatkun;
 
 
+
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 
-class ChatKun extends Model
+class ChatKun
 {
-    protected $table = "chatkun";
-    protected $fillable = ["user_id","last_online"];
+    private $chatKunRoomModel;
     private $chatKunMessageModel;
-    private $userModel;
-    public function __construct(array $attributes = [])
+    private $chatKunRoomMemberModel;
+    private $chatKunFactory;
+
+    public function __construct(ChatKunRoom $chatKunRoom,ChatKunMessage $chatKunMessage,ChatKunRoomMember $chatKunRoomMember,ChatKunFactory $chatKunFactory)
     {
-        $this->chatKunMessageModel = App::make(ChatKunMessage::class);
-        $this->userModel           = App::make(User::class);
-        parent::__construct($attributes);
+        $this->chatKunFactory         = $chatKunFactory;
+        $this->chatKunRoomModel       = $chatKunRoom;
+        $this->chatKunMessageModel    = $chatKunMessage;
+        $this->chatKunRoomMemberModel = $chatKunRoomMember;
     }
 
-    public function fromUser()
-    {
-        return $this->hasOne("App\User", "id", "user_id");
-    }
-
-    /** @param string $from
-     *  @param  string $to
-     *  @param  string $message
+    /**
+     * @param  string $name
+     * @param  string $roomType
+     * @return Model|ChatKunRoom
      */
-    private function sendMessageToService(User $user, $to, $message)
-    {
-        $chatKunFactory = new ChatKunFactory();
-        $chatKunService = $chatKunFactory->getChatService(config("chatkun.default_service", ""));
-        $chatKunService->sendMessage($user, $to, $message);
+    public function createRoom($name,$roomType){
+
+        return $this->chatKunRoomModel->create([
+            'name' => $name,
+            'room_type' => $roomType
+        ]);
     }
 
-    /** @param \App\User $toUser
-     *  @param  \Nattaponra\chatkun\ChatKunMessage $chatKunMessage
-     *
+    /**
+     * @param integer $roomId
+     * @return \Illuminate\Database\Eloquent\Collection|Model|ChatKunRoom|ChatKunRoom[]|null
      */
-    public function sendMessage(User $toUser,ChatKunMessage $chatKunMessage)
-    {
-        //Get Message
-        $subMessage = $chatKunMessage->getSubMessage();
+    public function findRoom($roomId){
+        return $this->chatKunRoomModel->find($roomId);
+    }
 
-        //Send message to service.
-        $this->sendMessageToService($this->fromUser, $toUser->id, $subMessage->getMessage());
+    /**
+     * @param \App\User $user
+     * @param  \nattaponra\chatkun\ChatKunRoom $chatKunRoom
+     * @return Model|ChatKunRoomMember|null
+     */
+    public function addMember(User $user,ChatKunRoom $chatKunRoom){
 
-
-        //Create initial message
-        if(!$this->hasInitialMessage($toUser)){
-            $this->createInitialMessage($toUser);
+        $member = $this->chatKunRoomMemberModel->where("user_id",$user->id)->where("room_id",$chatKunRoom->id)->first();
+        if(empty($member)){
+            return $this->chatKunRoomMemberModel->create([
+                'room_id' => $chatKunRoom->id,
+                'user_id' => $user->id,
+                'role'    => ''
+            ]);
         }
 
-        //Save message to database.
-        $chatKunMessage->user_id    = $this->fromUser->id;
-        $chatKunMessage->to_user_id = $toUser->id;
-        $chatKunMessage->chat_type  = "user_to_user";
-        $chatKunMessage->save();
-
-        //Save sub message to database.
-
-        $subMessage->messages_id = $chatKunMessage->id;
-        $subMessage->save();
-
-
-
+        return $member;
     }
 
-    private function createInitialMessage(User $toUser){
+    /**
+     * @param \App\User $user
+     * @param  \nattaponra\chatkun\ChatKunRoom $chatKunRoom
+     * @param  string $messageType
+     * @param  string $messageContent
+     * @return Model|ChatKunMessage
+     */
+    public function send(User $user,ChatKunRoom $chatKunRoom ,$messageType, $messageContent){
 
-        $chatKunMessage             = new ChatKunMessage();
-        $chatKunMessage->user_id    = $this->fromUser->id;
-        $chatKunMessage->to_user_id = $toUser->id;
-        $chatKunMessage->chat_type  = "initial_message";
-        $chatKunMessage->save();
 
-        $subMessage = new ChatKunSubMessage();
-        $subMessage->setMessage("initial_message");
-        $subMessage->setSubMessageType("initial_message");
-        $subMessage->messages_id = $chatKunMessage->id;
-        $subMessage->save();
+        $message =  $this->chatKunMessageModel->create([
+            'user_id'         => $user->id,
+            'room_id'         => $chatKunRoom->id,
+            'message_type'    => $messageType,
+            'message_content' => $messageContent
+        ]);
+
+       $chatKunService = $this->chatKunFactory->getChatService(config("chatkun.default_service", ""));
+       $chatKunService->sendMessage($message);
+
+        return $message;
     }
 
-
-    private function hasInitialMessage(User $toUser){
-
-        $count = $this->chatKunMessageModel->where("to_user_id",$toUser->id)->whereHas("subMessage",function($query){
-            $query->where("sub_message_type","initial_message");
-        })->count();
-
-        return $count == 1 ? true:false;
+    /**
+     * @param integer $roomId
+     * @param integer $messagePerPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function history($roomId,$messagePerPage){
+        return $this->chatKunMessageModel->where("room_id",$roomId)->paginate($messagePerPage);
     }
 
-    public function getMyContact()
-    {
-        $userId   = $this->fromUser->id;
-        //Send to
-        $results = $this->chatKunMessageModel->where(function($query) use ($userId){
+    public function getContacts(User $me){
 
-            $query->where("user_id",$userId);
-            $query->orWhere('to_user_id',$userId);
+        $rooms =  $this->chatKunRoomMemberModel->where("user_id",$me->id)->get();
+        $roomIds = [];
 
-        })->get();
-
-        $userIds = [];
-        foreach ($results as $result){
-
-            if($result->to_user_id != $userId){
-                $userIds[] = $result->to_user_id;
-            }
-
-            if($result->user_id != $userId){
-                $userIds[] = $result->user_id;
-            }
-
+        foreach ($rooms as $room){
+            $roomIds[] = $room->room_id;
         }
-        $userIds = array_unique($userIds);
-        return $this->userModel->whereIn("id",$userIds)->get();
 
+        $roomMembers =  $this->chatKunRoomMemberModel->whereIn("room_id",$roomIds)->where("user_id","!=",$me->id)->get();
+
+        $memberIds = [];
+        foreach ($roomMembers as $roomMember){
+            $memberIds[] = $roomMember->user_id;
+        }
+
+        return User::whereIn("id",$memberIds)->get();
     }
 
-    public function getChatHistories(User $toUser){
+    public function generateRoomByUser($roomType, User $me, User $contactUser){
 
-        $myUserId        = $this->fromUser->id;
-        $contactUserId   = $toUser->id;
+        $rooms =  $this->chatKunRoomMemberModel->whereHas('room', function ($query) use ($roomType) {
+            $query->where('room_type',$roomType);
+        })->where("user_id",$me->id)->get();
 
-        $messages = $results = $this->chatKunMessageModel
-             ->where(function($query) use($myUserId,$contactUserId){
-                $query->where("user_id",$myUserId)->where("to_user_id",$contactUserId)->where("chat_type","!=","initial_message");
-             })->orWhere(function($query) use($myUserId,$contactUserId){
-                $query->where("to_user_id",$myUserId)->where("user_id",$contactUserId)->where("chat_type","!=","initial_message");
-        })->orderBy("created_at","ASC")->get();
+        $roomIds = [];
 
+        foreach ($rooms as $room){
+            $roomIds[] = $room->room_id;
+        }
 
-        return $messages;
-    }
+        $room =  $this->chatKunRoomMemberModel->whereHas('room', function ($query) use ($roomType) {
+            $query->where('room_type',$roomType);
+        })->whereIn("room_id",$roomIds)->where("user_id",$contactUser->id)->first();
 
-    public function sendMessageGroup($groupId, ChatKunMessage $chatKunMessage){
-
-        //Get Message
-        $subMessage = $chatKunMessage->getSubMessage();
-
-        //Send message to service.
-        $this->sendMessageToService($this->fromUser, $groupId, $subMessage->getMessage());
-
-        //Save message to database.
-        $chatKunMessage->user_id    = $this->fromUser->id;
-        $chatKunMessage->to_user_id = $groupId;
-        $chatKunMessage->chat_type  = "group";
-        $chatKunMessage->save();
-
-        //Save sub message to database.
-        $subMessage->messages_id = $chatKunMessage->id;
-        $subMessage->save();
-    }
-
-
-    public function getChatGroupHistories($groupId, $limit=100 ){
-
-       return $this->chatKunMessageModel
-            ->where("chat_type","group")
-            ->where("to_user_id",$groupId)
-            ->whereHas("subMessage",function($query){
-               $query->whereNotNull("id");
-             })->with("subMessage")->orderBy("id","ASC")->limit($limit)->get();
-
-
-    }
-
-
-    public function getLastMessage(User $contactUser){
-        $myUserId        = $this->fromUser->id;
-        $contactUserId   = $contactUser->id;
-
-        $fromMessages = $results = $this->chatKunMessageModel
-            ->where("user_id",$contactUserId)
-            ->where("to_user_id",$myUserId)
-            ->where("chat_type","!=","initial_message")
-            ->with("subMessage")
-            ->first();
-
-
-        $toMessages = $results = $this->chatKunMessageModel
-                ->where("user_id",$myUserId)
-                ->where("to_user_id",$contactUserId)
-                ->where("chat_type","!=","initial_message")
-                ->with("subMessage")
-                ->first();
-
-        if(empty($fromMessages)){
-
-            if(!empty($toMessages)){
-
-                return $toMessages;
-                
-            }else{
-                return "";
-            }
-
+        if(empty($room)){
+            $room = $this->createRoom($roomType,"ROOM_".$me->id."_".$contactUser->id);
         }else{
-            return $fromMessages;
+            $room = $this->chatKunRoomModel->find($room->room_id);
         }
-    }
 
+        return $room;
+    }
 }
 
 
