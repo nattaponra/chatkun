@@ -9,6 +9,8 @@ use nattaponra\chatkun\ChatKunRoom;
  * @method static \nattaponra\chatkun\ChatKunRoom createRoom(string $name)
  * @method static \nattaponra\chatkun\ChatKunRoomMember addMember(User $user,ChatKunRoom $chatKunRoom))
  * @method static \nattaponra\chatkun\ChatKunMessage send(User $user,ChatKunRoom $chatKunRoom ,string $messageType, string $messageContent)
+ * @method static \nattaponra\chatkun\ChatKunRoom findRoom(int $roomId)
+ * @method static \nattaponra\chatkun\ChatKunRoom history(int $roomId)
  */
 
 

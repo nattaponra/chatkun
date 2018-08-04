@@ -32,9 +32,16 @@ class ChatKun
         ]);
     }
 
-    /**  @param \App\User $user
+    /**
+     * @param integer $roomId
+     * @return \Illuminate\Database\Eloquent\Collection|Model|ChatKunRoom|ChatKunRoom[]|null
+     */
+    public function findRoom($roomId){
+        return $this->chatKunRoomModel->find($roomId);
+    }
+
+    /** @param \App\User $user
      * @param  \nattaponra\chatkun\ChatKunRoom $chatKunRoom
-     *
      * @return Model|ChatKunRoomMember|null
      */
     public function addMember(User $user,ChatKunRoom $chatKunRoom){
@@ -55,7 +62,6 @@ class ChatKun
      * @param  \nattaponra\chatkun\ChatKunRoom $chatKunRoom
      * @param  string $messageType
      * @param  string $messageContent
-     *
      * @return Model|ChatKunMessage
      */
     public function send(User $user,ChatKunRoom $chatKunRoom ,$messageType, $messageContent){
@@ -73,7 +79,14 @@ class ChatKun
 
 
     }
-    
+
+
+    /**
+     * @param integer $roomId
+     */
+    public function history($roomId){
+        return $this->chatKunMessageModel->where("room_id",$roomId)->get();
+    }
 }
 
 
