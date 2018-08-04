@@ -128,13 +128,13 @@ class ChatKun
         foreach ($rooms as $room){
             $roomIds[] = $room->room_id;
         }
-
+         
         $room =  $this->chatKunRoomMemberModel->whereHas('room', function ($query) use ($roomType) {
             $query->where('room_type',$roomType);
         })->whereIn("room_id",$roomIds)->where("user_id",$contactUser->id)->first();
 
         if(empty($room)){
-            $room = $this->createRoom($roomType,"ROOM_".$me->id."_".$contactUser->id);
+            $room = $this->createRoom("ROOM_".$me->id."_".$contactUser->id, $roomType);
             $this->addMember($me,$room);
             $this->addMember($contactUser,$room);
 
