@@ -136,7 +136,7 @@ class ChatKun
         if(empty($room)){
             $room = $this->createRoom($roomType,"ROOM_".$me->id."_".$contactUser->id);
             $this->addMember($me,$room);
-            $this->addMember($me,$contactUser);
+            $this->addMember($contactUser,$room);
 
         }else{
             $room = $this->chatKunRoomModel->find($room->room_id);
