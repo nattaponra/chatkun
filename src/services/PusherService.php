@@ -30,8 +30,6 @@ class PusherService implements ChatKunServiceInterface
         }
     }
 
-    protected $fillable  = ["message_type","message_content","user_id","room_id"];
-
     public function sendMessage(ChatKunMessage $chatKunMessage)
     {
         $data['message_type']    = $chatKunMessage->message_type;
