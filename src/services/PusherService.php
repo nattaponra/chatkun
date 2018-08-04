@@ -4,8 +4,10 @@
 namespace nattaponra\chatkun\services;
 
 
-use App\User;
+
+use nattaponra\chatkun\ChatKunMessage;
 use Pusher\Pusher;
+use Pusher\PusherException;
 
 class PusherService implements ChatKunServiceInterface
 {
@@ -22,15 +24,24 @@ class PusherService implements ChatKunServiceInterface
        $this->app_key    = config("chatkun.services.pusher.key");
        $this->secret_key = config("chatkun.services.pusher.secret");
        $this->options    = config("chatkun.services.pusher.options");
-       $this->pusher     = new Pusher($this->app_key, $this->secret_key, $this->app_id, $this->options);
+        try {
+            $this->pusher = new Pusher($this->app_key, $this->secret_key, $this->app_id, $this->options);
+        } catch (PusherException $e) {
+        }
     }
 
-    public function sendMessage(User $user, $to, $message,$event="my")
-    {
-        $data['message']     = $message;
-        $data['sender_id']   = $user->id;
-        $data['sender_name'] = $user->name;
+    protected $fillable  = ["message_type","message_content","user_id","room_id"];
 
-        return $this->pusher->trigger($to.'-channel', $event."-event", $data);
+    public function sendMessage(ChatKunMessage $chatKunMessage)
+    {
+        $data['message_type']    = $chatKunMessage->message_type;
+        $data['message_content'] = $chatKunMessage->message_content;
+        $data['sender_name']     = $chatKunMessage->user->name;
+        //$data['sender_avatar']   = $chatKunMessage->user->name;
+        try {
+            return $this->pusher->trigger($chatKunMessage->room_id . '-channel', "my-event", $data);
+        } catch (PusherException $e) {
+
+        }
     }
 }
