@@ -32,6 +32,7 @@ class PusherService implements ChatKunServiceInterface
 
     public function sendMessage(ChatKunMessage $chatKunMessage)
     {
+        $data['message_id']      = $chatKunMessage->id;
         $data['message_type']    = $chatKunMessage->message_type;
         $data['message_content'] = $chatKunMessage->message_content;
         $data['sender_name']     = $chatKunMessage->user->name;
