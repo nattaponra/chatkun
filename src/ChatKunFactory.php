@@ -8,6 +8,10 @@ use nattaponra\chatkun\services\PusherService;
 
 class ChatKunFactory
 {
+    /**
+     * @param $serviceName
+     * @return PusherService|null
+     */
     public  function getChatService($serviceName)
     {
 

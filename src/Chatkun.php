@@ -15,6 +15,13 @@ class ChatKun
     private $chatKunRoomMemberModel;
     private $chatKunFactory;
 
+    /**
+     * ChatKun constructor.
+     * @param ChatKunRoom $chatKunRoom
+     * @param ChatKunMessage $chatKunMessage
+     * @param ChatKunRoomMember $chatKunRoomMember
+     * @param ChatKunFactory $chatKunFactory
+     */
     public function __construct(ChatKunRoom $chatKunRoom,ChatKunMessage $chatKunMessage,ChatKunRoomMember $chatKunRoomMember,ChatKunFactory $chatKunFactory)
     {
         $this->chatKunFactory         = $chatKunFactory;
@@ -45,8 +52,8 @@ class ChatKun
     }
 
     /**
-     * @param \App\User $user
-     * @param  \nattaponra\chatkun\ChatKunRoom $chatKunRoom
+     * @param User $user
+     * @param ChatKunRoom $chatKunRoom
      * @return Model|ChatKunRoomMember|null
      */
     public function addMember(User $user,ChatKunRoom $chatKunRoom){
@@ -64,10 +71,10 @@ class ChatKun
     }
 
     /**
-     * @param \App\User $user
-     * @param  \nattaponra\chatkun\ChatKunRoom $chatKunRoom
-     * @param  string $messageType
-     * @param  string $messageContent
+     * @param User $user
+     * @param ChatKunRoom $chatKunRoom
+     * @param $messageType
+     * @param $messageContent
      * @return Model|ChatKunMessage
      */
     public function send(User $user,ChatKunRoom $chatKunRoom ,$messageType, $messageContent){
@@ -98,6 +105,10 @@ class ChatKun
         return $history;
     }
 
+    /**
+     * @param User $me
+     * @return User[]|\Illuminate\Database\Eloquent\Collection
+     */
     public function getContacts(User $me){
 
         $rooms =  $this->chatKunRoomMemberModel->where("user_id",$me->id)->get();
@@ -116,6 +127,13 @@ class ChatKun
 
         return User::whereIn("id",$memberIds)->get();
     }
+
+    /**
+     * @param $roomType
+     * @param User $me
+     * @param User $contactUser
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Collection|Model|mixed|ChatKunRoom|ChatKunRoom[]|ChatKunRoomMember|null
+     */
 
     public function generateRoomByUser($roomType, User $me, User $contactUser){
 

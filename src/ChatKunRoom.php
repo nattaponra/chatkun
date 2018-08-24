@@ -19,8 +19,15 @@ class ChatKunRoom extends Model
     const GROUP_ROOM = 'group';
 
 
+    /**
+     * @var array
+     */
     protected $fillable  = ["name","room_type"];
 
+    /**
+     * ChatKunRoom constructor.
+     * @param array $attributes
+     */
     public function __construct(array $attributes = [])
     {
         $this->table = "chatkun_rooms";
