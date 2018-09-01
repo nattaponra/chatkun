@@ -184,7 +184,8 @@ class ChatKun
      * @return int
      */
     public function getUnreadMessageCount(User $me){
-        $unreadMessages =  $this->chatKunMessageStatusModel->where("user_id",$me->id)->where("status","unread")->get();
+
+        $unreadMessages =  $this->chatKunMessageStatusModel->whereHas("message")->where("user_id",$me->id)->where("status","unread");
         return $unreadMessages->count();
     }
 
