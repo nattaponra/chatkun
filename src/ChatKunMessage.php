@@ -38,4 +38,9 @@ class ChatKunMessage extends Model
         return $this->message_content;
     }
 
+
+    public function messageStatus(){
+        return $this->hasOne(ChatKunMessageStatus::class,"message_id","id" );
+    }
+
 }
