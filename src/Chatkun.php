@@ -13,6 +13,7 @@ class ChatKun
     private $chatKunRoomModel;
     private $chatKunMessageModel;
     private $chatKunRoomMemberModel;
+    private $chatKunMessageStatusModel;
     private $chatKunFactory;
 
     /**
@@ -20,14 +21,17 @@ class ChatKun
      * @param ChatKunRoom $chatKunRoom
      * @param ChatKunMessage $chatKunMessage
      * @param ChatKunRoomMember $chatKunRoomMember
+     * @param ChatKunMessageStatus $chatKunMessageStatus
      * @param ChatKunFactory $chatKunFactory
      */
-    public function __construct(ChatKunRoom $chatKunRoom,ChatKunMessage $chatKunMessage,ChatKunRoomMember $chatKunRoomMember,ChatKunFactory $chatKunFactory)
+
+    public function __construct(ChatKunRoom $chatKunRoom,ChatKunMessage $chatKunMessage,ChatKunRoomMember $chatKunRoomMember,ChatKunMessageStatus $chatKunMessageStatus,ChatKunFactory $chatKunFactory)
     {
-        $this->chatKunFactory         = $chatKunFactory;
-        $this->chatKunRoomModel       = $chatKunRoom;
-        $this->chatKunMessageModel    = $chatKunMessage;
-        $this->chatKunRoomMemberModel = $chatKunRoomMember;
+        $this->chatKunFactory            = $chatKunFactory;
+        $this->chatKunRoomModel          = $chatKunRoom;
+        $this->chatKunMessageModel       = $chatKunMessage;
+        $this->chatKunRoomMemberModel    = $chatKunRoomMember;
+        $this->chatKunMessageStatusModel = $chatKunMessageStatus;
     }
 
     /**
@@ -77,15 +81,27 @@ class ChatKun
      * @param $messageContent
      * @return Model|ChatKunMessage
      */
-    public function send(User $user,ChatKunRoom $chatKunRoom ,$messageType, $messageContent){
+    public function send(User $user,ChatKunRoom $chatKunRoom ,$messageType, $messageContent)
+    {
 
 
-        $message =  $this->chatKunMessageModel->create([
-            'user_id'         => $user->id,
-            'room_id'         => $chatKunRoom->id,
-            'message_type'    => $messageType,
+        $message = $this->chatKunMessageModel->create([
+            'user_id' => $user->id,
+            'room_id' => $chatKunRoom->id,
+            'message_type' => $messageType,
             'message_content' => $messageContent
         ]);
+
+
+        $chatKunRoomMembers = $this->chatKunRoomMemberModel->where("room_id", $chatKunRoom->id)->where("user_id", "!=", $user->id)->get();
+
+        foreach ($chatKunRoomMembers as $member){
+            $this->chatKunMessageStatusModel->create([
+                'message_id' => $message->id,
+                'user_id'    => $member->user_id,
+                'status'     => "unread",
+            ]);
+        }
 
        $chatKunService = $this->chatKunFactory->getChatService(config("chatkun.default_service", ""));
        $chatKunService->sendMessage($message);
@@ -162,6 +178,26 @@ class ChatKun
 
         return $room;
     }
+
+    /**
+     * @param User $me
+     * @return int
+     */
+    public function getUnreadMessageCount(User $me){
+        $unreadMessages =  $this->chatKunMessageStatusModel->where("user_id",$me->id)->where("status","unread")->get();
+        return $unreadMessages->count();
+    }
+
+    /**
+     * @param $roomId
+     * @param User $me
+     */
+    public function makeRead($roomId,User $me){
+        $this->chatKunMessageStatusModel->whereHas("message",function($query) use ($roomId){
+            $query->where("room_id",$roomId);
+        })->where("user_id",$me->id)->where("status","unread")->update(["status" => "read"]);
+    }
+
 }
 
 
