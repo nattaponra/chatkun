@@ -6,6 +6,15 @@
             "email": "nattapon.rakthong@gmail.com"
         }
     ],
+    "autoload": {
+        "classmap": [
+            "database"
+        ],
+        "psr-4": {
+          "NattaponRa\\chatkun\\": "src/"
+
+        }
+    },
     "require": {
         "pusher/pusher-php-server": "^3.0"
     },
